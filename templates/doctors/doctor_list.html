@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="doctor-page-header reveal-up">
+        <div>
+            <span class="text-uppercase small text-primary fw-semibold">Specialist Directory</span>
+            <h2 class="fw-bold mb-1">Choose the Right Doctor</h2>
+            <p class="text-secondary mb-0">Browse seeded doctors by department and book from active availability slots.</p>
+        </div>
+        <form method="get" class="d-flex gap-2">
+            <select name="specialization" class="form-select">
+                <option value="">All Specializations</option>
+                {% for item in specializations %}
+                    <option value="{{ item }}" {% if item == selected_specialization %}selected{% endif %}>{{ item }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+
+    <div class="specialization-pills reveal-up">
+        <a href="{% url 'doctors:doctor_list' %}" class="spec-pill {% if not selected_specialization %}active{% endif %}">All</a>
+        {% for item in specializations %}
+            <a href="?specialization={{ item|urlencode }}" class="spec-pill {% if item == selected_specialization %}active{% endif %}">{{ item }}</a>
+        {% endfor %}
+    </div>
+
+    <div class="row g-4 mt-1">
+        {% for doctor in doctors %}
+            <div class="col-lg-4 col-md-6">
+                <div class="doctor-directory-card reveal-up">
+                    <div class="doctor-directory-top">
+                        <div class="doctor-avatar lg">
+                            {{ doctor.user.first_name|default:doctor.user.username|slice:":1" }}{{ doctor.user.last_name|slice:":1" }}
+                        </div>
+                        <div>
+                            <span class="badge badge-soft-primary mb-2">{{ doctor.specialization|default:'General Physician' }}</span>
+                            <h4 class="fw-bold mb-1">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h4>
+                            <p class="text-secondary mb-0">{{ doctor.qualification|default:'Consultant Specialist' }}</p>
+                        </div>
+                    </div>
+                    <div class="doctor-facts">
+                        <span><i class="bi bi-hospital"></i> {{ doctor.hospital_name|default:'City Care Hospital' }}</span>
+                        <span><i class="bi bi-briefcase"></i> {{ doctor.experience_years }} years</span>
+                        <span><i class="bi bi-cash-coin"></i> Rs. {{ doctor.consultation_fee }}</span>
+                    </div>
+                    <p class="text-secondary small mb-3">{{ doctor.bio|default:'Doctor profile will be updated from the dashboard.'|truncatewords:24 }}</p>
+                    <div class="card-footer bg-transparent border-0 pt-0 pb-0 px-0">
+                        {% if request.user.is_authenticated and request.user.role == 'patient' %}
+                            <a href="{% url 'appointments:book_appointment' doctor.id %}" class="btn btn-primary w-100 btn-glow">Book Appointment</a>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary w-100">Login to Book</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No doctors found for the selected specialization.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

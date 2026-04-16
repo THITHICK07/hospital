@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-4">Doctor Profile</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Specialization</label>
+                                {{ form.specialization }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Qualification</label>
+                                {{ form.qualification }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Experience (Years)</label>
+                                {{ form.experience_years }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Consultation Fee</label>
+                                {{ form.consultation_fee }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hospital Name</label>
+                                {{ form.hospital_name }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                {{ form.address }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Bio</label>
+                                {{ form.bio }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

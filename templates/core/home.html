@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero-section py-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6 reveal-up">
+                <span class="badge badge-soft-primary mb-3 px-3 py-2">Advanced Medical Booking Platform</span>
+                <h1 class="display-4 fw-bold mb-3">Making Health Care Better Together</h1>
+                <p class="lead text-secondary mb-4">A clean hospital-style portal for booking appointments, browsing specialists, handling doctor availability, and managing patient care with confidence.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg btn-glow">Get Started</a>
+                    <a href="{% url 'doctors:doctor_list' %}" class="btn btn-outline-primary btn-lg">Find Doctors</a>
+                </div>
+                <div class="row g-3 mt-4">
+                    <div class="col-sm-6">
+                        <div class="stat-card">
+                            <h3>{{ doctor_count }}</h3>
+                            <p class="mb-0">Doctors Available</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="stat-card">
+                            <h3>{{ appointment_count }}</h3>
+                            <p class="mb-0">Appointments Managed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 reveal-up">
+                <div class="hero-visual shadow-lg">
+                    <div class="doctor-portrait">
+                        <div class="portrait-badge">Live Care</div>
+                        <div class="doctor-silhouette">
+                            <i class="bi bi-person-heart"></i>
+                        </div>
+                    </div>
+                    <div class="floating-card floating-top">
+                        <strong>{{ specialization_count }}</strong>
+                        <span>Specialist Departments</span>
+                    </div>
+                    <div class="floating-card floating-bottom">
+                        <strong>24/7</strong>
+                        <span>Appointment Access</span>
+                    </div>
+                    <div class="mini-service-grid">
+                        <div class="info-box">
+                            <h5>Patient Friendly</h5>
+                            <p class="mb-0">Simple registration, doctor browsing, and quick appointment booking.</p>
+                        </div>
+                        <div class="info-box">
+                            <h5>Doctor Tools</h5>
+                            <p class="mb-0">Manage profile, add time slots, and approve or reject requests.</p>
+                        </div>
+                        <div class="info-box">
+                            <h5>Secure Setup</h5>
+                            <p class="mb-0">Environment-based configuration for secrets and deployment values.</p>
+                        </div>
+                        <div class="info-box">
+                            <h5>Render Ready</h5>
+                            <p class="mb-0">Prepared for Gunicorn, Whitenoise, and static deployment flow.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-4">
+    <div class="container">
+        <div class="service-strip reveal-up">
+            <div class="service-pill"><i class="bi bi-shield-check"></i> Trusted Specialists</div>
+            <div class="service-pill"><i class="bi bi-calendar2-check"></i> Easy Scheduling</div>
+            <div class="service-pill"><i class="bi bi-credit-card-2-front"></i> Mock Payment Flow</div>
+            <div class="service-pill"><i class="bi bi-hospital"></i> Hospital Styled Dashboard</div>
+        </div>
+    </div>
+</section>
+
+<section class="pb-5">
+    <div class="container">
+        <div class="section-heading reveal-up">
+            <div>
+                <span class="text-uppercase small text-primary fw-semibold">Top Specialists</span>
+                <h2 class="fw-bold mb-1">Meet Our Featured Doctors</h2>
+                <p class="text-secondary mb-0">Carefully seeded demo profiles across major specialist sectors.</p>
+            </div>
+            <a href="{% url 'doctors:doctor_list' %}" class="btn btn-outline-primary">View All Doctors</a>
+        </div>
+        <div class="row g-4 mt-1">
+            {% for doctor in featured_doctors %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="doctor-showcase-card reveal-up">
+                        <div class="doctor-avatar">
+                            {{ doctor.user.first_name|default:doctor.user.username|slice:":1" }}{{ doctor.user.last_name|slice:":1" }}
+                        </div>
+                        <span class="badge badge-soft-primary mb-3">{{ doctor.specialization }}</span>
+                        <h4 class="fw-bold mb-1">Dr. {{ doctor.user.get_full_name|default:doctor.user.username }}</h4>
+                        <p class="text-secondary mb-2">{{ doctor.qualification|default:"Consultant Specialist" }}</p>
+                        <p class="text-secondary small mb-3">{{ doctor.bio|truncatewords:18 }}</p>
+                        <div class="doctor-meta-row">
+                            <span><i class="bi bi-briefcase"></i> {{ doctor.experience_years }} yrs</span>
+                            <span><i class="bi bi-cash-stack"></i> Rs. {{ doctor.consultation_fee }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 reveal-up">
+                    <div class="alert alert-info mb-0">No featured doctors yet. Run the demo seed command to add specialist profiles.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

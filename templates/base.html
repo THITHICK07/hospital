@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Healthcare Appointment System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="bg-orb orb-one"></div>
+    <div class="bg-orb orb-two"></div>
+    <nav class="navbar navbar-expand-lg navbar-dark custom-navbar">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{% url 'core:home' %}">
+                <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
+                <span>Smart Healthcare</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    {% if request.user.is_authenticated and request.user.role == 'doctor' %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'appointments:doctor_appointments' %}">Appointments</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'doctors:manage_slots' %}">Slots</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'core:home' %}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'doctors:doctor_list' %}">Doctors</a></li>
+                        {% if request.user.is_authenticated %}
+                            {% if request.user.role == 'patient' %}
+                                <li class="nav-item"><a class="nav-link" href="{% url 'appointments:patient_dashboard' %}">Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'payments:payment_list' %}">Payments</a></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">Login</a></li>
+                            <li class="nav-item ms-lg-2"><a class="btn btn-light btn-sm px-3" href="{% url 'accounts:register' %}">Register</a></li>
+                        {% endif %}
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item ms-lg-2">
+                            <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-light btn-sm px-3 nav-logout-btn">Logout</button>
+                            </form>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="py-4">
+        <div class="container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.12 });
+
+            document.querySelectorAll('.reveal-up').forEach((item) => observer.observe(item));
+        });
+    </script>
+</body>
+</html>

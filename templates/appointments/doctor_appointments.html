@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Appointments</h2>
+            <p class="text-secondary mb-0">Manage and complete patient appointments.</p>
+        </div>
+    </div>
+
+    <!-- Specialization Filter -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Filter by Specialization</label>
+                    <select class="form-select" onchange="filterBySpec(this.value)">
+                        <option value="all">All Appointments</option>
+                        {% for spec in specializations %}
+                            <option value="{{ spec }}" {% if selected_specialization == spec %}selected{% endif %}>{{ spec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light">
+            <h5 class="fw-bold mb-0">Upcoming Appointments</h5>
+        </div>
+        <div class="card-body">
+            {% if appointments %}
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date</th>
+                            <th>Time Slot</th>
+                            <th>Reason</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                            <tr>
+                                <td>{{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}</td>
+                                <td>Dr. {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}</td>
+                                <td>{{ appointment.date|date:"M d, Y" }}</td>
+                                <td>{{ appointment.time_slot }}</td>
+                                <td>{{ appointment.reason|default:'-' }}</td>
+                                <td>
+                                    <a href="{% url 'appointments:complete_appointment' appointment.id %}" class="btn btn-sm btn-success">Complete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-center text-secondary py-4 mb-0">No upcoming appointments.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Appointment History -->
+    {% if completed_appointments %}
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="fw-bold mb-0">Appointment History</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Date</th>
+                            <th>Time Slot</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in completed_appointments %}
+                            <tr>
+                                <td>{{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}</td>
+                                <td>{{ appointment.date }}</td>
+                                <td>{{ appointment.time_slot }}</td>
+                                <td>{{ appointment.reason|default:'-' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function filterBySpec(specialization) {
+    if (specialization === 'all') {
+        window.location.href = '{% url 'appointments:doctor_appointments' %}';
+    } else {
+        window.location.href = '{% url 'appointments:doctor_appointments' %}?specialization=' + specialization;
+    }
+}
+</script>
+{% endblock %}

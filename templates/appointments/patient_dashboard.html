@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Patient Dashboard</h2>
+            <p class="text-secondary mb-0">Track your appointments and payment status from one place.</p>
+        </div>
+        <a href="{% url 'doctors:doctor_list' %}" class="btn btn-primary">Book New Appointment</a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="stat-card h-100"><h3>{{ stats.total }}</h3><p class="mb-0">Total Appointments</p></div></div>
+        <div class="col-md-4"><div class="stat-card h-100"><h3>{{ stats.pending }}</h3><p class="mb-0">Pending</p></div></div>
+        <div class="col-md-4"><div class="stat-card h-100"><h3>{{ stats.approved }}</h3><p class="mb-0">Approved</p></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Appointment History</h4>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Doctor</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in history %}
+                                    <tr>
+                                        <td>Dr. {{ appointment.doctor.user.get_full_name|default:appointment.doctor.user.username }}</td>
+                                        <td>{{ appointment.date }}</td>
+                                        <td>{{ appointment.time_slot }}</td>
+                                        <td>{{ appointment.reason|default:'-' }}</td>
+                                        <td><span class="badge {% if appointment.status == 'Completed' %}bg-success{% else %}bg-primary{% endif %}">{{ appointment.status }}</span></td>
+                                        <td>
+                                            {% if appointment.status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif appointment.status != 'Cancelled' %}
+                                                <a href="{% url 'appointments:cancel_appointment' appointment.id %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="6" class="text-center text-secondary">No appointments booked yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Recent Payments</h4>
+                    {% for payment in payments %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between">
+                                <strong>Dr. {{ payment.appointment.doctor.user.get_full_name|default:payment.appointment.doctor.user.username }}</strong>
+                                <span class="badge {% if payment.status == 'Paid' %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ payment.status }}</span>
+                            </div>
+                            <div class="text-secondary small mt-2">Amount: Rs. {{ payment.amount }}</div>
+                        </div>
+                    {% empty %}
+                        <p class="text-secondary mb-0">No payments yet.</p>
+                    {% endfor %}
+                    <a href="{% url 'payments:payment_list' %}" class="btn btn-outline-primary w-100">View All Payments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

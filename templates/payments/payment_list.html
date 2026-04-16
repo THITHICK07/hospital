@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Payments</h2>
+            <p class="text-secondary mb-0">Simple mock payment tracking for booked appointments.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for payment in payments %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-2">Dr. {{ payment.appointment.doctor.user.get_full_name|default:payment.appointment.doctor.user.username }}</h5>
+                        <p class="mb-2"><strong>Date:</strong> {{ payment.appointment.date }}</p>
+                        <p class="mb-2"><strong>Time Slot:</strong> {{ payment.appointment.time_slot }}</p>
+                        <p class="mb-3"><strong>Amount:</strong> Rs. {{ payment.amount }}</p>
+                        <span class="badge {% if payment.status == 'Paid' %}bg-success{% else %}bg-warning text-dark{% endif %}">{{ payment.status }}</span>
+                    </div>
+                    <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                        {% if payment.status == 'Pending' %}
+                            <a href="{% url 'payments:make_payment' payment.id %}" class="btn btn-primary w-100">Pay Now</a>
+                        {% else %}
+                            <button class="btn btn-success w-100" disabled>Payment Completed</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No payment records available.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

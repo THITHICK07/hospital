@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-2">Book Appointment</h2>
+                    <p class="text-secondary">Doctor: Dr. {{ doctor.user.get_full_name|default:doctor.user.username }} | {{ doctor.specialization|default:'General Physician' }}</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            {{ form.date }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Time Slot</label>
+                            {{ form.time_slot }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Reason</label>
+                            {{ form.reason }}
+                        </div>
+                        {% if form.errors %}
+                            <div class="alert alert-danger">{{ form.errors }}</div>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Available Slots</h4>
+                    {% for slot in all_slots %}
+                        {% if slot.is_available %}
+                            <div class="border rounded p-3 mb-2 slot-item" style="cursor: pointer; transition: all 0.3s; border-color: #28a745;" onclick="selectSlot(event, '{{ slot.date|date:'Y-m-d' }}', '{{ slot.time_slot }}')">
+                                <strong>{{ slot.date|date:'M d, Y' }}</strong>
+                                <div class="text-secondary">{{ slot.time_slot }}</div>
+                                <small class="text-success"><i class="bi bi-check-circle"></i> Available</small>
+                            </div>
+                        {% else %}
+                            <div class="border rounded p-3 mb-2 slot-item" style="cursor: not-allowed; opacity: 0.6; border-color: #dc3545; background-color: #fff5f5;">
+                                <strong class="text-muted">{{ slot.date|date:'M d, Y' }}</strong>
+                                <div class="text-muted">{{ slot.time_slot }}</div>
+                                <small class="text-danger"><i class="bi bi-x-circle"></i> Booked</small>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <p class="text-secondary mb-0">No slots available for this doctor right now.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function selectSlot(event, date, timeSlot) {
+    // Check if slot is booked (has opacity style)
+    const slotElement = event.currentTarget;
+    if (slotElement.style.opacity === '0.6' || slotElement.style.cursor === 'not-allowed') {
+        alert('This slot is already booked. Please select an available slot.');
+        return;
+    }
+    
+    const dateInput = document.querySelector('[name="date"]');
+    const timeInput = document.querySelector('[name="time_slot"]');
+    
+    // Set date in correct format (YYYY-MM-DD)
+    dateInput.value = date;
+    timeInput.value = timeSlot;
+    
+    // Highlight selected slot
+    document.querySelectorAll('.slot-item').forEach(item => {
+        if (item.style.opacity !== '0.6') {
+            item.style.backgroundColor = '';
+            item.style.borderColor = '#28a745';
+        }
+    });
+    slotElement.style.backgroundColor = '#e8f4f8';
+    slotElement.style.borderColor = '#0d6efd';
+}
+</script>
+{% endblock %}

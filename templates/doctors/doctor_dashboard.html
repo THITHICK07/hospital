@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Doctor Dashboard</h2>
+            <p class="text-secondary mb-0">Manage your profile, time slots, and appointment requests.</p>
+        </div>
+        <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-primary">Edit Profile</a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4"><div class="stat-card h-100"><h3>{{ stats.total }}</h3><p class="mb-0">Total Appointments</p></div></div>
+        <div class="col-md-4"><div class="stat-card h-100"><h3>{{ stats.pending }}</h3><p class="mb-0">Pending Requests</p></div></div>
+        <div class="col-md-4"><div class="stat-card h-100"><h3>{{ stats.approved }}</h3><p class="mb-0">Approved Appointments</p></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Add Availability</h4>
+                    <form method="post" action="{% url 'doctors:add_availability' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Date</label>
+                            {{ availability_form.date }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Time Slot</label>
+                            {{ availability_form.time_slot }}
+                        </div>
+                        <button class="btn btn-primary w-100">Add Slot</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-body">
+                    <h4 class="fw-bold mb-3">Recent Slots</h4>
+                    {% for slot in availabilities %}
+                        <div class="d-flex justify-content-between align-items-center border rounded p-3 mb-2">
+                            <div>
+                                <strong>{{ slot.date }}</strong>
+                                <div class="text-secondary small">{{ slot.time_slot }}</div>
+                            </div>
+                            <div>
+                                {% if slot.is_available %}
+                                    <span class="badge bg-success">Available</span>
+                                    <a href="{% url 'doctors:delete_availability' slot.id %}" class="btn btn-sm btn-outline-danger ms-2">Delete</a>
+                                {% else %}
+                                    <span class="badge bg-secondary">Booked</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-secondary mb-0">No slots added yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold mb-0">Appointments</h4>
+                        <a href="{% url 'appointments:doctor_appointments' %}" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                    <tr>
+                                        <td>{{ appointment.patient.user.get_full_name|default:appointment.patient.user.username }}</td>
+                                        <td>{{ appointment.date }}</td>
+                                        <td>{{ appointment.time_slot }}</td>
+                                        <td><span class="badge bg-primary">{{ appointment.status }}</span></td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="4" class="text-center text-secondary">No appointments yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
