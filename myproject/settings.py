@@ -9,7 +9,7 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-smart-healthcare-demo-key")
 DEBUG = False
-ALLOWED_HOSTS=.onrender.com
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", ".onrender.com").split(",")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
